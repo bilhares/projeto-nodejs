@@ -2,12 +2,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const config = require('./config')
 
 const app = express();
 const router = express.Router();
 
 //conexao banco
-mongoose.connect('mongodb://bilhares:bilhares@ds040877.mlab.com:40877/ndstr', {
+mongoose.connect(config.connectionString, {
     useMongoClient: true,
     socketTimeoutMS: 0,
     keepAlive: true,
@@ -16,16 +17,20 @@ mongoose.connect('mongodb://bilhares:bilhares@ds040877.mlab.com:40877/ndstr', {
 //carregar os modelos
 const Product = require('./models/product');
 const Customer = require('./models/customer');
+const Order = require('./models/order');
 //carrega as rotas
 const indexRoute = require('./routes/index-route');
 const productRoute = require('./routes/product-route')
-
+const customerRoute = require('./routes/customer-route')
+const orderRoute = require('./routes/order-route')
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/', indexRoute);
 app.use('/products', productRoute);
+app.use('/customers', customerRoute);
+app.use('/orders', orderRoute);
 
 module.exports = app;
 
