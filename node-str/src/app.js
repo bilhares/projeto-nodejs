@@ -15,6 +15,7 @@ mongoose.connect('mongodb://bilhares:bilhares@ds040877.mlab.com:40877/ndstr', {
 });
 //carregar os modelos
 const Product = require('./models/product');
+const Customer = require('./models/customer');
 //carrega as rotas
 const indexRoute = require('./routes/index-route');
 const productRoute = require('./routes/product-route')
@@ -27,3 +28,11 @@ app.use('/', indexRoute);
 app.use('/products', productRoute);
 
 module.exports = app;
+
+// {
+// 	"title":"Max steel",
+// 	"description":"Boneco max steel",
+// 	"slug":"max-steel",
+// 	"price":2000,
+// 	"tags":["brinquedos", "infantil"]
+// }
