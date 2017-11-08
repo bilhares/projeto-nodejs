@@ -18,7 +18,8 @@ exports.post = async (req, res, next) => {
         await repository.create({
             name: req.body.name,
             email: req.body.email,
-            password: md5(req.body.password + global.SALT_KEY)
+            password: md5(req.body.password + global.SALT_KEY),
+            roles: ['user']
         });
         //envio email
         emailService.send(req.body.email, 'Bem vindo ao Node store', global.EMAIL_TMPL.replace('{0}', req.body.name));
@@ -49,7 +50,8 @@ exports.authenticate = async (req, res, next) => {
             {
                 id: customer._id,
                 email: customer.email,
-                name: customer.name
+                name: customer.name,
+                roles: customer.roles
             });
         res.status(201).send(
             {
@@ -67,27 +69,33 @@ exports.authenticate = async (req, res, next) => {
 exports.refreshToken = async (req, res, next) => {
     console.log('Aqui 1')
     try {
-        const customer = await repository.authenticate({
-            email: req.body.email,
-            password: md5(req.body.password + global.SALT_KEY)
-        });
+
+        //recupera o token
+        const token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+        //decodificar token
+        const data = await authService.decodeToken(token);
+
+        const customer = await repository.getById(data.id);
         console.log(customer.name);
+
         if (!customer) {
             res.status(404).send(
                 {
-                    message: 'Usuario ou senha invalidos.'
+                    message: 'Cliente não encontrado.'
                 });
             return;
         }
-        const token = await authService.generateToken(
+        const tokenData = await authService.generateToken(
             {
                 id: customer._id,
                 email: customer.email,
-                name: customer.name
+                name: customer.name,
+                roles: customer.roles
             });
         res.status(201).send(
             {
-                token: token,
+                token: tokenData,
                 data: {
                     email: customer.email, name: customer.name
                 }

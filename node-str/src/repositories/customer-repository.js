@@ -16,3 +16,9 @@ exports.authenticate = async(data) => {
     console.log(res.email);
     return res;
 }
+
+
+exports.getById = async(id) => {
+    const res = await Customer.findById(id);
+    return res;
+}
